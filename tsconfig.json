@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    // "moduleResolution": "node16",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "target": "ES2022",
+    "sourceMap": true,
+    "lib": ["ES2022", "DOM"],
+
+    "strict": true,
+    "declaration": true,
+    "incremental": true,
+    "verbatimModuleSyntax": false,
+    "erasableSyntaxOnly": true,
+
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "baseUrl": "./"
+  },
+  "include": ["./src/**/*.ts"]
+}
