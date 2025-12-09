@@ -1,10 +1,3 @@
-type Config = {
-  circular: boolean
-  depth: number
-  prototype: any
-  includeNonEnumerable: boolean
-}
-
 /**
  * Clones (copies) an Object using deep copying.
  *
@@ -26,29 +19,26 @@ type Config = {
  *    should be cloned as well. Non-enumerable properties on the prototype
  *    chain will be ignored. (optional - false by default)
  */
-function clone<P>(
+export default function clone<P>(
   parent: P,
   circular: boolean | Config = true,
   depth: number = Infinity,
-  prototype: any,
+  prototype: any = undefined,
   includeNonEnumerable: boolean = false,
-) {
+): P {
   if (typeof circular === 'object') {
-    depth = circular.depth
+    depth = circular.depth || depth
     prototype = circular.prototype
-    includeNonEnumerable = circular.includeNonEnumerable
-    circular = circular.circular
+    includeNonEnumerable = circular.includeNonEnumerable || includeNonEnumerable
+    circular = circular.circular || false
   }
   // maintain two arrays for circular references, where corresponding parents
   // and children have the same index
   const ancestors: any = []
   const allChildren: any = []
 
-  if (typeof circular == 'undefined') circular = true
-  if (typeof depth == 'undefined') depth = Infinity
-
-  // recurse this function so we don't reset allParents and allChildren
-  function _clone<C>(parent: any, depth: number) {
+  // recurse this function so we don't reset ancestors and allChildren
+  function _clone(parent: any, depth: number) {
     // cloning null always returns null
     if (parent === null) return null
 
@@ -75,20 +65,21 @@ function clone<P>(
           },
         )
       })
-    } else if (clone.__isArray(parent)) {
+    } else if (__isArray(parent)) {
       child = []
-    } else if (clone.__isRegExp(parent)) {
+    } else if (__isRegExp(parent)) {
       child = new RegExp(parent.source, __getRegExpFlags(parent))
       if (parent.lastIndex) child.lastIndex = parent.lastIndex
-    } else if (clone.__isDate(parent)) {
+    } else if (__isDate(parent)) {
       child = new Date(parent.getTime())
     } else if (Buffer.isBuffer(parent)) {
       child = Buffer.from(parent)
       return child
     } else if (parent instanceof Error) {
-      child = Object.create(parent)
+      // child = Object.create(parent)
+      child = structuredClone(parent)
     } else {
-      if (typeof prototype == 'undefined') {
+      if (typeof prototype === 'undefined') {
         proto = Object.getPrototypeOf(parent)
         child = Object.create(proto)
       } else {
@@ -187,28 +178,29 @@ function __objToStr(o: any) {
   return Object.prototype.toString.call(o)
 }
 
-function __isDate(o: any) {
+export function __isDate(o: any) {
   return typeof o === 'object' && __objToStr(o) === '[object Date]'
 }
-clone.__isDate = __isDate
 
-function __isArray(o: any) {
+export function __isArray(o: any) {
   return typeof o === 'object' && __objToStr(o) === '[object Array]'
 }
-clone.__isArray = __isArray
 
-function __isRegExp(o: any) {
+export function __isRegExp(o: any) {
   return typeof o === 'object' && __objToStr(o) === '[object RegExp]'
 }
-clone.__isRegExp = __isRegExp
 
-function __getRegExpFlags(re: RegExp) {
+export function __getRegExpFlags(re: RegExp) {
   let flags = ''
   if (re.global) flags += 'g'
   if (re.ignoreCase) flags += 'i'
   if (re.multiline) flags += 'm'
   return flags
 }
-clone.__getRegExpFlags = __getRegExpFlags
 
-module.exports = clone
+type Config = {
+  circular?: boolean
+  depth?: number
+  prototype?: any
+  includeNonEnumerable?: boolean
+}

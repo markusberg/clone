@@ -1,5 +1,5 @@
 {
-  "name": "clone",
+  "name": "@markusberg/clone",
   "description": "deep cloning of objects and arrays",
   "tags": [
     "clone",
@@ -16,7 +16,7 @@
   "bugs": {
     "url": "https://github.com/pvorb/node-clone/issues"
   },
-  "type": "commonjs",
+  "type": "module",
   "main": "./dist/clone.js",
   "author": "Paul Vorbach <paul@vorba.ch> (http://paul.vorba.ch/)",
   "contributors": [
@@ -49,7 +49,6 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "nodeunit": "~0.9.0",
     "@types/node": "^24.0.0",
     "nodemon": "^3.1.11",
     "typescript": "^5.9.3"
@@ -61,9 +60,8 @@
     "build:test": "tsc -p .",
     "clean": "rm -fr dist *.tsbuildinfo coverage && mkdir -p dist coverage",
     "prepublishOnly": "npm run build",
-    "test-ts": "npm run clean && npm run test:one",
+    "test": "npm run clean && npm run test:one",
     "test:one": "npm run build:test && node --enable-source-maps --test --experimental-test-coverage --test-reporter=spec --test-reporter=lcov --test-reporter-destination=stdout --test-reporter-destination=./coverage/lcov.info './dist/**/*.test.js'",
-    "test:watch": "npm run clean && nodemon -e ts -w ./src --exec 'npm run test:one'",
-    "test": "nodeunit test.js"
+    "test:watch": "npm run clean && nodemon -e ts -w ./src --exec 'npm run test:one'"
   }
 }

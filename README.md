@@ -1,6 +1,6 @@
 # clone
 
-[![build status](https://secure.travis-ci.org/pvorb/clone.svg)](http://travis-ci.org/pvorb/clone) [![downloads](https://img.shields.io/npm/dt/clone.svg)](http://npm-stat.com/charts.html?package=clone)
+[![downloads](https://img.shields.io/npm/dt/@markusberg/clone.svg)](http://npm-stat.com/charts.html?package=@markusberg/clone)
 
 offers foolproof _deep cloning_ of objects, arrays, numbers, strings, maps,
 sets, promises, etc. in JavaScript.
@@ -17,14 +17,12 @@ option `noParse` in browserify to reduce the resulting file size, since usually
 
 ## Example
 
-~~~ javascript
-var clone = require('clone');
+~~~ typescript
+import clone from '@markusberg/clone'
 
-var a, b;
+let a: any = { foo: { bar: 'baz' } };  // initial value of a
 
-a = { foo: { bar: 'baz' } };  // initial value of a
-
-b = clone(a);                 // clone a -> b
+let b = clone(a);             // clone a -> b
 a.foo.bar = 'foo';            // change a
 
 console.log(a);               // show a
@@ -33,13 +31,13 @@ console.log(b);               // show b
 
 This will print:
 
-~~~ javascript
+~~~ typescript
 { foo: { bar: 'foo' } }
 { foo: { bar: 'baz' } }
 ~~~
 
-**clone** masters cloning simple objects (even with custom prototype), arrays,
-Date objects, and RegExp objects. Everything is cloned recursively, so that you
+**clone** masters cloning simple objects (even with custom prototype), `arrays`,
+`Date objects`, and `RegExp objects`. Everything is cloned recursively, so that you
 can clone dates in arrays in objects, for example.
 
 
@@ -66,23 +64,13 @@ can clone dates in arrays in objects, for example.
 you can specify `circular`, `depth`, `prototype` and `includeNonEnumerable` with
 a single `opts` `Object`.
 
-### `clone.clonePrototype(obj)`
-
-  * `obj` -- the object that you want to clone
-
-Does a prototype clone as
-[described by Oran Looney](http://oranlooney.com/functional-javascript/).
-
-
 ## Circular References
 
 ~~~ javascript
-var a, b;
-
-a = { hello: 'world' };
+let a: any = { hello: 'world' };
 
 a.myself = a;
-b = clone(a);
+let b = clone(a);
 
 console.log(b);
 ~~~
@@ -102,6 +90,12 @@ So, `b.myself` points to `b`, not `a`. Neat!
 
 
 ## Changelog
+
+### v3.0.0
+
+ - Convert to TypeScript
+ - Use the built-in Node.Js test runner
+ - Drop support for Node.Js versions before v20
 
 ### v2.1.2
 
