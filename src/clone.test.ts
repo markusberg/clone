@@ -9,15 +9,15 @@ import clone, {
   __isRegExp,
 } from './clone.js'
 
-function inspect(obj: any) {
-  const seen: any[] = []
-  return JSON.stringify(obj, (key, val) => {
+function inspect(obj: any): string {
+  const seen = new Set<any>()
+  return JSON.stringify(obj, (_key, val) => {
     if (val !== null && typeof val === 'object') {
-      if (seen.indexOf(val) >= 0) {
+      if (seen.has(val)) {
         return '[cyclic]'
       }
 
-      seen.push(val)
+      seen.add(val)
     }
 
     return val
@@ -31,15 +31,15 @@ function apartContext(ctx: any, script: string, callback: Function) {
   callback(runInContext(script, context))
 }
 
-describe('clone tests', () => {
-  it('clone string', () => {
+describe('The clone function', () => {
+  it('should clone strings', () => {
     let a = 'foo'
     assert.strictEqual(clone(a), a)
     a = ''
     assert.strictEqual(clone(a), a)
   })
 
-  it('clone number', () => {
+  it('should clone number numbers', () => {
     let a = 0
     assert.strictEqual(clone(a), a)
     a = 1
@@ -52,7 +52,7 @@ describe('clone tests', () => {
     assert.strictEqual(clone(a), a)
   })
 
-  it('clone date', () => {
+  it('should clone date objects', () => {
     const a = new Date()
     const c = clone(a)
     assert.ok(!!a.getUTCDate && !!a.toUTCString)
@@ -60,14 +60,14 @@ describe('clone tests', () => {
     assert.equal(a.getTime(), c.getTime())
   })
 
-  it('clone object', () => {
+  it('should clone regular objects', () => {
     const a = { foo: { bar: 'baz' } }
     const b = clone(a)
 
     assert.deepEqual(b, a)
   })
 
-  it('clone error', () => {
+  it('should clone Error objects', () => {
     const a = new Error('Boom!!!')
     const b = clone(a)
 
@@ -77,7 +77,7 @@ describe('clone tests', () => {
     assert.equal(b.message, a.message)
   })
 
-  it('clone array', () => {
+  it('should clone arrays', () => {
     let a = [{ foo: 'bar' }, 'baz']
     let b = clone(a)
 
@@ -85,7 +85,7 @@ describe('clone tests', () => {
     assert.deepEqual(b, a)
   })
 
-  it('clone buffer', () => {
+  it('should clone buffers', () => {
     if (typeof Buffer == 'undefined') {
       return
     }
@@ -97,7 +97,7 @@ describe('clone tests', () => {
     assert.deepEqual(b, a)
   })
 
-  it('clone regexp', () => {
+  it('should clone regular expressions', () => {
     let a = /abc123/gi
     let b = clone(a)
     assert.deepEqual(b, a)
@@ -113,7 +113,7 @@ describe('clone tests', () => {
     assert.ok(d.lastIndex === 4)
   })
 
-  it('clone object containing array', () => {
+  it('should clone objects containing arrays', () => {
     let a = {
       arr1: [{ a: '1234', b: '2345' }],
       arr2: [{ c: '345', d: '456' }],
@@ -124,7 +124,7 @@ describe('clone tests', () => {
     assert.deepEqual(b, a)
   })
 
-  it('clone object with circular reference', () => {
+  it('should clone objects with circular references', () => {
     let c: any = [1, 'foo', { hello: 'bar' }, function () {}, false, [2]]
     let b = [c, 2, 3, 4]
 
@@ -152,19 +152,7 @@ describe('clone tests', () => {
     }
   })
 
-  it('clone within an apart context', () => {
-    let results = apartContext(
-      { clone: clone },
-      'results = ctx.clone({ a: [1, 2, 3], d: new Date(), r: /^foo$/ig })',
-      function (results: any) {
-        assert.ok(results.a.constructor.toString() === Array.toString())
-        assert.ok(results.d.constructor.toString() === Date.toString())
-        assert.ok(results.r.constructor.toString() === RegExp.toString())
-      },
-    )
-  })
-
-  it('clone object with no constructor', () => {
+  it('should clone object with no constructor', () => {
     let n = null
 
     let a: any = { foo: 'bar' }
@@ -176,8 +164,8 @@ describe('clone tests', () => {
     assert.ok(a.foo, b.foo)
   })
 
-  it('clone object with depth argument', () => {
-    let a = {
+  it('should clone object with depth argument', () => {
+    const a = {
       foo: {
         bar: {
           baz: 'qux',
@@ -185,29 +173,29 @@ describe('clone tests', () => {
       },
     }
 
-    let b = clone(a, false, 1)
+    const b = clone(a, false, 1)
     assert.deepEqual(b, a)
     assert.notEqual(b, a)
     assert.strictEqual(b.foo, a.foo)
 
-    b = clone(a, true, 2)
-    assert.deepEqual(b, a)
-    assert.notEqual(b.foo, a.foo)
-    assert.strictEqual(b.foo.bar, a.foo.bar)
+    const c = clone(a, true, 2)
+    assert.deepEqual(c, a)
+    assert.notEqual(c.foo, a.foo)
+    assert.strictEqual(c.foo.bar, a.foo.bar)
   })
 
-  it('maintain prototype chain in clones', () => {
+  it('should maintain prototype chain in clones', () => {
     const T: any = function () {}
     const a = new T()
     const b = clone(a)
     assert.strictEqual(Object.getPrototypeOf(a), Object.getPrototypeOf(b))
   })
 
-  it('parent prototype is overriden with prototype provided', () => {
-    const T: any = function () {}
+  it('should override the parent prototype with provided prototype', () => {
+    const orig: any = function () {}
 
-    const a = new T()
-    const b = clone(a, true, Infinity, null)
+    const a = new orig()
+    const b = clone(a, undefined, undefined, null)
     assert.strictEqual(b.__defineSetter__, undefined)
   })
 
@@ -221,12 +209,12 @@ describe('clone tests', () => {
       },
     }
 
-    let b = clone(a)
+    const b = clone(a)
 
     assert.deepEqual(b, a)
   })
 
-  it('clone instance with getter', () => {
+  it('should clone instance with getter', () => {
     const Ctor: any = function () {}
     Object.defineProperty(Ctor.prototype, 'prop', {
       configurable: true,
@@ -242,18 +230,18 @@ describe('clone tests', () => {
     assert.strictEqual(b.prop, 'value')
   })
 
-  it('clone object with symbol properties', () => {
+  it('should clone objects with symbol properties', () => {
     const symbol = Symbol()
     const obj: any = {}
     obj[symbol] = 'foo'
 
-    let child = clone(obj)
+    const child = clone(obj)
 
     assert.notEqual(child, obj)
     assert.equal(child[symbol], 'foo')
   })
 
-  it('symbols are treated as primitives', () => {
+  it('should treat symbols as primitives', () => {
     const symbol = Symbol()
     const obj = { foo: symbol }
     const child = clone(obj)
@@ -262,7 +250,7 @@ describe('clone tests', () => {
     assert.equal(child.foo, obj.foo)
   })
 
-  it('get RegExp flags', () => {
+  it('should clone RegExp flags', () => {
     assert.strictEqual(__getRegExpFlags(/a/), '')
     assert.strictEqual(__getRegExpFlags(/a/i), 'i')
     assert.strictEqual(__getRegExpFlags(/a/g), 'g')
@@ -270,11 +258,21 @@ describe('clone tests', () => {
     assert.strictEqual(__getRegExpFlags(/a/m), 'm')
   })
 
-  it('recognize Array object', () => {
-    const results = apartContext(
-      null,
-      'results = [1, 2, 3]',
-      (alien: unknown) => {
+  describe('the apart context', () => {
+    it('should clone within an apart context', () => {
+      apartContext(
+        { clone },
+        'results = ctx.clone({ a: [1, 2, 3], d: new Date(), r: /^foo$/ig })',
+        function (results: any) {
+          assert.ok(results.a.constructor.toString() === Array.toString())
+          assert.ok(results.d.constructor.toString() === Date.toString())
+          assert.ok(results.r.constructor.toString() === RegExp.toString())
+        },
+      )
+    })
+
+    it('should recognize an Array object', () => {
+      apartContext(null, 'results = [1, 2, 3]', (alien: unknown) => {
         const local = [4, 5, 6]
         assert.ok(__isArray(alien)) // recognize in other context.
         assert.ok(__isArray(local)) // recognize in local context.
@@ -282,15 +280,11 @@ describe('clone tests', () => {
         assert.ok(!__isDate(local))
         assert.ok(!__isRegExp(alien))
         assert.ok(!__isRegExp(local))
-      },
-    )
-  })
+      })
+    })
 
-  it('recognize Date object', () => {
-    const results = apartContext(
-      null,
-      'results = new Date()',
-      (alien: unknown) => {
+    it('should recognize a Date object', () => {
+      apartContext(null, 'results = new Date()', (alien: unknown) => {
         const local = new Date()
 
         assert.ok(__isDate(alien)) // recognize in other context.
@@ -299,24 +293,24 @@ describe('clone tests', () => {
         assert.ok(!__isArray(local))
         assert.ok(!__isRegExp(alien))
         assert.ok(!__isRegExp(local))
-      },
-    )
-  })
+      })
+    })
 
-  it('recognize RegExp object', () => {
-    const results = apartContext(null, 'results = /foo/', (alien: unknown) => {
-      const local = /bar/
+    it('should recognize a RegExp object', () => {
+      apartContext(null, 'results = /foo/', (alien: unknown) => {
+        const local = /bar/
 
-      assert.ok(__isRegExp(alien)) // recognize in other context.
-      assert.ok(__isRegExp(local)) // recognize in local context.
-      assert.ok(!__isArray(alien))
-      assert.ok(!__isArray(local))
-      assert.ok(!__isDate(alien))
-      assert.ok(!__isDate(local))
+        assert.ok(__isRegExp(alien)) // recognize in other context.
+        assert.ok(__isRegExp(local)) // recognize in local context.
+        assert.ok(!__isArray(alien))
+        assert.ok(!__isArray(local))
+        assert.ok(!__isDate(alien))
+        assert.ok(!__isDate(local))
+      })
     })
   })
 
-  it('clone a Map', () => {
+  it('should clone a Map', () => {
     const map: any = new Map()
     // simple key/value
     map.set('foo', 'bar')
@@ -335,7 +329,7 @@ describe('clone tests', () => {
     assert.equal(clonedMap.circle, clonedMap)
   })
 
-  it('clone a Set', () => {
+  it('should clone a Set', () => {
     const set: any = new Set()
     // simple entry
     set.add('foo')
@@ -346,7 +340,7 @@ describe('clone tests', () => {
     // regular circular expando property
     set.circle = set
 
-    let clonedSet = clone(set)
+    const clonedSet = clone(set)
     assert.notEqual(set, clonedSet)
     assert.ok(clonedSet.has('foo'))
     assert.ok(clonedSet.has(clonedSet))
@@ -356,25 +350,25 @@ describe('clone tests', () => {
   })
 
   describe('clone Promises', () => {
-    it('clone a Promise that resolves to a value', () => {
+    it('should clone a Promise that resolves to a value', () => {
       clone(Promise.resolve('foo')).then((value: any) => {
         assert.equal(value, 'foo')
       })
     })
 
-    it('clone a Promise that rejects to a value', () => {
+    it('should clone a Promise that rejects to a value', () => {
       clone(Promise.reject('bar')).catch((value: any) => {
         assert.equal(value, 'bar')
       })
     })
 
-    it('clone a Promise that resolves to a Promise', () => {
+    it('should clone a Promise that resolves to a Promise', () => {
       clone(Promise.resolve(Promise.resolve('baz'))).then((value: any) => {
         assert.equal(value, 'baz')
       })
     })
 
-    it('clone a Promise that resolves to a circular value', () => {
+    it('should clone a Promise that resolves to a circular value', () => {
       const circle: any = {}
       circle.circle = circle
       clone(Promise.resolve(circle)).then((value: any) => {
@@ -383,7 +377,7 @@ describe('clone tests', () => {
       })
     })
 
-    it('clone a Promise with additional props', () => {
+    it('should clone a Promise with additional props', () => {
       const expandoPromise: any = Promise.resolve('ok')
       expandoPromise.circle = expandoPromise
       expandoPromise.prop = 'val'
@@ -398,7 +392,7 @@ describe('clone tests', () => {
     })
   })
 
-  it('clone only enumerable symbol properties', () => {
+  it('should clone only enumerable symbol properties', () => {
     const source: any = {}
     const symbol1 = Symbol('the first symbol')
     const symbol2 = Symbol('the second symbol')
@@ -410,13 +404,13 @@ describe('clone tests', () => {
       enumerable: false,
     })
 
-    let cloned = clone(source)
+    const cloned = clone(source)
     assert.equal(cloned[symbol1], 1)
     assert.equal(cloned.hasOwnProperty(symbol2), false)
     assert.equal(cloned[symbol3], 3)
   })
 
-  it('clone should ignore non-enumerable properties by default', () => {
+  it('should ignore non-enumerable properties by default', () => {
     const source: any = {
       x: 1,
       y: 2,
@@ -443,7 +437,7 @@ describe('clone tests', () => {
     assert.equal(cloned.hasOwnProperty(symbol2), false)
   })
 
-  it('clone should support cloning non-enumerable properties', () => {
+  it('should support cloning non-enumerable properties', () => {
     const source: any = { x: 1, b: [2] }
     Object.defineProperty(source, 'b', {
       enumerable: false,
@@ -463,7 +457,7 @@ describe('clone tests', () => {
     assert.equal(cloned[symbol].x, 3)
   })
 
-  it('clone should allow enabling the cloning of non-enumerable properties via an options object', () => {
+  it('should allow enabling the cloning of non-enumerable properties via an options object', () => {
     const source = { x: 1 }
     Object.defineProperty(source, 'x', {
       enumerable: false,
@@ -475,7 +469,7 @@ describe('clone tests', () => {
     assert.equal(cloned.x, 1)
   })
 
-  it('clone should mark the cloned non-enumerable properties as non-enumerable', () => {
+  it('should mark the cloned non-enumerable properties as non-enumerable', () => {
     const source: any = { x: 1, y: 2 }
     Object.defineProperty(source, 'y', {
       enumerable: false,
@@ -488,7 +482,7 @@ describe('clone tests', () => {
       enumerable: false,
     })
 
-    let cloned = clone(source, {
+    const cloned = clone(source, {
       includeNonEnumerable: true,
     })
     assert.equal(Object.getOwnPropertyDescriptor(cloned, 'x')?.enumerable, true)

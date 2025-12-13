@@ -1,4 +1,10 @@
 /node_modules/
 /test.js
 /.travis.yml
-*.html
+/.github
+/docs
+/src
+
+.node-version
+.prettierrc
+tsconfig.*

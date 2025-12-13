@@ -2,6 +2,8 @@
 
 [![downloads](https://img.shields.io/npm/dt/@markusberg/clone.svg)](http://npm-stat.com/charts.html?package=@markusberg/clone)
 
+This package is essentially a clone of the original [clone](https://npmjs.com/clone) package, but with modernized code and tooling.
+
 offers foolproof _deep cloning_ of objects, arrays, numbers, strings, maps,
 sets, promises, etc. in JavaScript.
 
@@ -166,19 +168,19 @@ So, `b.myself` points to `b`, not `a`. Neat!
 
 Some special objects like a socket or `process.stdout`/`stderr` are known to not
 be cloneable. If you find other objects that cannot be cloned, please [open an
-issue](https://github.com/pvorb/clone/issues/new).
+issue](https://github.com/markusberg/clone/issues/new).
 
 
 ## Bugs and Issues
 
 If you encounter any bugs or issues, feel free to [open an issue at
-github](https://github.com/pvorb/clone/issues) or send me an email to
+github](https://github.com/markusberg/clone/issues) or send me an email to
 <paul@vorba.ch>. I also always like to hear from you, if you’re using my code.
 
 ## License
 
 Copyright © 2011-2016 [Paul Vorbach](https://paul.vorba.ch/) and
-[contributors](https://github.com/pvorb/clone/graphs/contributors).
+[contributors](https://github.com/markusberg/clone/graphs/contributors).
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the “Software”), to deal in
