@@ -1,8 +1,7 @@
-/node_modules/
-/test.js
-/.travis.yml
 /.github
+/.husky
 /docs
+/node_modules/
 /src
 
 .node-version

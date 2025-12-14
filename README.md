@@ -1,65 +1,74 @@
 # clone
 
+[![node.js build](https://github.com/markusberg/clone/actions/workflows/badges.yaml/badge.svg)](https://github.com/markusberg/clone/actions/workflows/badges.yaml)
+[![coverage](https://markusberg.github.io/clone/badges/coverage-3.0.1.svg)](https://github.com/markusberg/clone/actions)
+![version](https://img.shields.io/npm/v/@markusberg/clone.svg)
+[![license](https://img.shields.io/github/license/markusberg/clone.svg)](./LICENSE)
 [![downloads](https://img.shields.io/npm/dt/@markusberg/clone.svg)](http://npm-stat.com/charts.html?package=@markusberg/clone)
 
-This package is essentially a clone of the original [clone](https://npmjs.com/clone) package, but with modernized code and tooling.
+This package is a fork of the original [clone](https://npmjs.com/package/clone) package, but with modernized code and tooling.
 
-offers foolproof _deep cloning_ of objects, arrays, numbers, strings, maps,
+It offers foolproof _deep cloning_ of objects, arrays, numbers, strings, maps,
 sets, promises, etc. in JavaScript.
-
 
 ## Installation
 
-    npm install clone
+    npm install @markusberg/clone
 
 (It also works with browserify, ender or standalone. You may want to use the
 option `noParse` in browserify to reduce the resulting file size, since usually
 `Buffer`s are not needed in browsers.)
 
-
 ## Example
 
-~~~ typescript
+```typescript
 import clone from '@markusberg/clone'
 
-let a: any = { foo: { bar: 'baz' } };  // initial value of a
+let a: any = { foo: { bar: 'baz' } } // initial value of a
 
-let b = clone(a);             // clone a -> b
-a.foo.bar = 'foo';            // change a
+let b = clone(a) // clone a -> b
+a.foo.bar = 'foo' // change a
 
-console.log(a);               // show a
-console.log(b);               // show b
-~~~
+console.log(a) // show a
+console.log(b) // show b
+```
 
 This will print:
 
-~~~ typescript
-{ foo: { bar: 'foo' } }
-{ foo: { bar: 'baz' } }
-~~~
+```typescript
+{
+  foo: {
+    bar: 'foo'
+  }
+}
+{
+  foo: {
+    bar: 'baz'
+  }
+}
+```
 
 **clone** masters cloning simple objects (even with custom prototype), `arrays`,
 `Date objects`, and `RegExp objects`. Everything is cloned recursively, so that you
 can clone dates in arrays in objects, for example.
 
-
 ## API
 
 ### `clone(value[, circular[, depth[, prototype[, includeNonEnumerable]]]])`
 
-  * `value`: The value that you want to clone, any type allowed.
-  * `circular`: Boolean, defaults to `true`.
-    Call `clone` with `circular` set to `false` if you are certain that `obj`
-    contains no circular references. This will give better performance if
-    needed. There is no error if `undefined` or `null` is passed as `obj`.
-  * `depth`: Depth to which the object is to be cloned (optional,
-    defaults to `Infinity`)
-  * `prototype`: Sets the prototype to be used when cloning an `Object`.
-    (optional, defaults to `__proto__` of the to be cloned value, ie. the cloned
-    object will have the same prototype as the original).
-  * `includeNonEnumerable`: Set to `true` if the non-enumerable properties
-    should be cloned as well. Non-enumerable properties on the prototype chain
-    will be ignored. (optional, defaults to `false`)
+- `value`: The value that you want to clone, any type allowed.
+- `circular`: Boolean, defaults to `true`.
+  Call `clone` with `circular` set to `false` if you are certain that `obj`
+  contains no circular references. This will give better performance if
+  needed. There is no error if `undefined` or `null` is passed as `obj`.
+- `depth`: Depth to which the object is to be cloned (optional,
+  defaults to `Infinity`)
+- `prototype`: Sets the prototype to be used when cloning an `Object`.
+  (optional, defaults to `__proto__` of the to be cloned value, ie. the cloned
+  object will have the same prototype as the original).
+- `includeNonEnumerable`: Set to `true` if the non-enumerable properties
+  should be cloned as well. Non-enumerable properties on the prototype chain
+  will be ignored. (optional, defaults to `false`)
 
 ### `clone(value, opts)`
 
@@ -68,108 +77,105 @@ a single `opts` `Object`.
 
 ## Circular References
 
-~~~ javascript
+```javascript
 let a: any = { hello: 'world' };
 
 a.myself = a;
 let b = clone(a);
 
 console.log(b);
-~~~
+```
 
 This will print:
 
-~~~ javascript
+```javascript
 { hello: "world", myself: [Circular] }
-~~~
+```
 
 So, `b.myself` points to `b`, not `a`. Neat!
-
 
 ## Test
 
     npm test
 
-
 ## Changelog
 
 ### v3.0.0
 
- - Convert to TypeScript
- - Use the built-in Node.Js test runner
- - Drop support for Node.Js versions before v20
+- Convert to TypeScript
+- Use the built-in Node.Js test runner
+- Drop support for Node.Js versions before v20
 
 ### v2.1.2
 
 #### 2018-03-21
 
-  - Use `Buffer.allocUnsafe()` on Node >= 4.5.0 (contributed by @ChALkeR)
+- Use `Buffer.allocUnsafe()` on Node >= 4.5.0 (contributed by @ChALkeR)
 
 ### v2.1.1
 
 #### 2017-03-09
 
-  - Fix build badge in README
-  - Add support for cloning Maps and Sets on Internet Explorer
+- Fix build badge in README
+- Add support for cloning Maps and Sets on Internet Explorer
 
 ### v2.1.0
 
 #### 2016-11-22
 
-  - Add support for cloning Errors
-  - Exclude non-enumerable symbol-named object properties from cloning
-  - Add option to include non-enumerable own properties of objects
+- Add support for cloning Errors
+- Exclude non-enumerable symbol-named object properties from cloning
+- Add option to include non-enumerable own properties of objects
 
 ### v2.0.0
 
 #### 2016-09-28
 
-  - Add support for cloning ES6 Maps, Sets, Promises, and Symbols
+- Add support for cloning ES6 Maps, Sets, Promises, and Symbols
 
 ### v1.0.4
 
 #### 2018-03-21
 
-  - Use `Buffer.allocUnsafe()` on Node >= 4.5.0 (contributed by @ChALkeR;
-    backported from v2.1.2)
+- Use `Buffer.allocUnsafe()` on Node >= 4.5.0 (contributed by @ChALkeR;
+  backported from v2.1.2)
 
 ### v1.0.3
 
 #### 2017-11-08
 
-  - Close XSS vulnerability in the NPM package, which included the file
-    `test-apart-ctx.html`. This vulnerability was disclosed by Juho Nurminen of
-    2NS - Second Nature Security.
+- Close XSS vulnerability in the NPM package, which included the file
+  `test-apart-ctx.html`. This vulnerability was disclosed by Juho Nurminen of
+  2NS - Second Nature Security.
 
 ### v1.0.2 (deprecated)
 
 #### 2015-03-25
 
-  - Fix call on getRegExpFlags
-  - Refactor utilities
-  - Refactor test suite
+- Fix call on getRegExpFlags
+- Refactor utilities
+- Refactor test suite
 
 ### v1.0.1 (deprecated)
 
 #### 2015-03-04
 
-  - Fix nodeunit version
-  - Directly call getRegExpFlags
+- Fix nodeunit version
+- Directly call getRegExpFlags
 
 ### v1.0.0 (deprecated)
 
 #### 2015-02-10
 
-  - Improve browser support
-  - Improve browser testability
-  - Move helper methods to private namespace
+- Improve browser support
+- Improve browser testability
+- Move helper methods to private namespace
 
 ## Caveat
 
 Some special objects like a socket or `process.stdout`/`stderr` are known to not
 be cloneable. If you find other objects that cannot be cloned, please [open an
 issue](https://github.com/markusberg/clone/issues/new).
-
 
 ## Bugs and Issues
 
