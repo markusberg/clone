@@ -8,7 +8,7 @@
     "function",
     "date"
   ],
-  "version": "3.0.0",
+  "version": "3.0.1",
   "repository": {
     "type": "git",
     "url": "git://github.com/pvorb/node-clone.git"
@@ -47,7 +47,8 @@
     "Martin Jurča (https://github.com/jurca)",
     "Misery Lee <miserylee@foxmail.com> (https://github.com/miserylee)",
     "Clemens Wolff (https://github.com/c-w)",
-    "Sabin Thomas (https://github.com/sabinthomas)"
+    "Sabin Thomas (https://github.com/sabinthomas)",
+    "Markus Berg <markus@kelvin.nu> (https://github.com/markusberg"
   ],
   "license": "MIT",
   "engines": {
@@ -55,8 +56,13 @@
   },
   "dependencies": {},
   "devDependencies": {
+    "@markusberg/lcov-parse": "^3.0.0",
     "@types/node": "^24.0.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
     "nodemon": "^3.1.11",
+    "prettier": "^3.7.4",
+    "rimraf": "^6.1.2",
     "typescript": "^5.9.3"
   },
   "optionalDependencies": {},
@@ -64,10 +70,15 @@
     "build": "npm run clean && npm run build:prod",
     "build:prod": "tsc -p ./tsconfig.prod.json",
     "build:test": "tsc -p .",
-    "clean": "rm -fr dist *.tsbuildinfo coverage && mkdir -p dist coverage",
+    "clean": "rimraf dist *.tsbuildinfo coverage && mkdir -p dist coverage",
+    "prep": "npm install && husky && chmod ug+x .husky/*",
     "prepublishOnly": "npm run build",
     "test": "npm run clean && npm run test:one",
-    "test:one": "npm run build:test && node --enable-source-maps --test --experimental-test-coverage --test-reporter=spec --test-reporter=lcov --test-reporter-destination=stdout --test-reporter-destination=./coverage/lcov.info './dist/**/*.test.js'",
+    "test:one": "npm run build:test && node --enable-source-maps --test --experimental-test-coverage --test-reporter=spec --test-reporter=lcov --test-reporter-destination=stdout --test-reporter-destination=./coverage/lcov.info './dist/**/*.test.js' && npm run test:cov",
+    "test:cov": "lcov-parse --summary ./coverage/lcov.info > ./coverage/coverage-summary.json",
     "test:watch": "npm run clean && nodemon -e ts -w ./src --exec 'npm run test:one'"
+  },
+  "lint-staged": {
+    "(*.ts|*.md)": "prettier --write --check"
   }
 }
